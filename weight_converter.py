@@ -1,4 +1,4 @@
-# Weight Converter - kg <-> lbs, with history and light/dark themes.
+# Weight Converter - kg <-> lbs, with history and light/dark themes. Developer © @bardh1xyz https://github.com/bardh1xyz
 
 import json
 import math
@@ -72,9 +72,6 @@ DARK = {
 
 
 def pick_ui_font(root):
-    # "Segoe UI" only exists on Windows, so on Mac/Linux the app would've
-    # silently fallen back to whatever Tk feels like. Pick something decent
-    # that's actually installed instead.
     wanted = ["SF Pro Text", "Segoe UI", "Helvetica Neue", "Ubuntu", "Noto Sans", "Helvetica", "Arial"]
     installed = set(tkfont.families(root))
     for name in wanted:
@@ -109,8 +106,7 @@ def parse_weight(raw):
     if not text or not re.fullmatch(r"[0-9][0-9,.]*", text):
         return None
 
-    # comma = thousands separator, dot = decimal point - matches how
-    # format_number() below writes numbers back out
+
     text = text.replace(",", "")
     if text.count(".") > 1:
         return None
@@ -174,7 +170,7 @@ class WeightConverterApp:
         self.refresh_history()
         self.entry.focus_set()
 
-    # ---- settings / history on disk -----------------------------------
+    # NOTE settings
 
     def load_settings(self):
         try:
@@ -229,7 +225,7 @@ class WeightConverterApp:
         except OSError:
             pass
 
-    # ---- window setup ---------------------------------------------------
+    # NOTE window setup
 
     def build_window(self):
         self.root.title("Weight Converter")
@@ -314,7 +310,7 @@ class WeightConverterApp:
             label = f"\u2713  {mode.title()}" if self.theme == mode else mode.title()
             self.view_menu.entryconfigure(index, label=label)
 
-    # ---- layout -----------------------------------------------------------
+    # NOTE layout
 
     def build_layout(self):
         root = self.root
@@ -412,8 +408,6 @@ class WeightConverterApp:
         self.clear_btn.pack(fill=tk.X)
 
     def build_result_card(self):
-        # rows 0/1/3 keep their natural height, row 2 is the only one that
-        # stretches - so the copy button (row 3) never gets squeezed out.
         card = self.result_card = tk.Frame(self.left, bd=0, highlightthickness=1)
         card.grid(row=1, column=0, sticky="nsew", pady=(16, 0))
         card.grid_columnconfigure(0, weight=1)
@@ -523,7 +517,7 @@ class WeightConverterApp:
         if self.toast and self.toast.winfo_exists():
             self.place_toast()
 
-    # ---- theme ----------------------------------------------------------
+    # theme
 
     def set_theme(self, mode, persist=True, announce="Theme updated."):
         if mode not in ("system", "light", "dark"):
@@ -636,7 +630,7 @@ class WeightConverterApp:
         fg = c["selected_text"] if selected else c["muted"]
         button.configure(bg=bg, fg=fg, activebackground=bg, activeforeground=fg)
 
-    # ---- hover states ---------------------------------------------------
+    # hover states
 
     def on_entry_focus(self, focused):
         color = self.colors["focus"] if focused else self.colors["border"]
@@ -666,7 +660,7 @@ class WeightConverterApp:
             return
         self.result_label.configure(fg=self.colors["accent_hover"] if on else self.colors["accent"])
 
-    # ---- conversion -----------------------------------------------------
+    # conversion
 
     def on_weight_typed(self, *_args):
         if self.suppress_trace:
@@ -777,7 +771,7 @@ class WeightConverterApp:
         self.result_hint.configure(text="Click the value to copy")
         self.style_result_text()
 
-    # ---- history ----------------------------------------------------------
+    # history
 
     def remember_conversion(self, text, number, unit, target, converted):
         self.history = [item for item in self.history if item.get("text") != text]
@@ -846,7 +840,7 @@ class WeightConverterApp:
         self.refresh_history()
         self.set_status("History cleared.", "success")
 
-    # ---- input / clipboard / toast ---------------------------------------
+    # input  clipboard  toast
 
     def clear_input(self):
         self.suppress_trace = True
@@ -937,7 +931,7 @@ class WeightConverterApp:
         self.root.attributes("-fullscreen", self.fullscreen)
         self.set_status("Fullscreen on." if self.fullscreen else "Fullscreen off.", "success")
 
-    # ---- confirm dialog ---------------------------------------------------
+    # confirm dialog
 
     def ask_confirm(self, title, message):
         dialog = tk.Toplevel(self.root)
@@ -986,7 +980,7 @@ class WeightConverterApp:
         self.root.wait_window(dialog)
         return result["ok"]
 
-    # ---- settings window --------------------------------------------------
+    # settings window
 
     def open_settings(self):
         if self.settings_win and self.settings_win.winfo_exists():
@@ -1132,7 +1126,7 @@ class WeightConverterApp:
         self.theme_before_preview = None
         self.root.focus_force()
 
-    # ---- about window -------------------------------------------------
+    # NOTE about window
 
     def show_about(self):
         if self.about_win and self.about_win.winfo_exists():
@@ -1231,7 +1225,7 @@ class WeightConverterApp:
         except Exception:
             self.set_status("Could not open the link.", "danger")
 
-    # ---- shutdown -----------------------------------------------------
+    # exit
 
     def on_close(self):
         for job in (self.debounce_job, self.copy_flash_job, self.theme_poll_job):
